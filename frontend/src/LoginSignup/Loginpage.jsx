@@ -14,7 +14,7 @@ const Loginpage = () => {
   };
 
   const fetchProfile = async () => {
-    const response = await fetch("https://todoapp-backend-40tq.onrender.com/profile", {
+    const response = await fetch("https://demo-todo-zdid.onrender.com/profile", {
       method: "GET",
       credentials: "include",
     });
@@ -29,7 +29,7 @@ const Loginpage = () => {
   };
 
   const login = async () => {
-    const response = await fetch("https://todoapp-backend-40tq.onrender.com/login", {
+    const response = await fetch("https://demo-todo-zdid.onrender.com/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -49,7 +49,7 @@ const Loginpage = () => {
   };
 
   const signup = async () => {
-    const response = await fetch("https://todoapp-backend-40tq.onrender.com/signup", {
+    const response = await fetch("https://demo-todo-zdid.onrender.com/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

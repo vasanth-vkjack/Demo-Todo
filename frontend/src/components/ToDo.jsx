@@ -39,7 +39,7 @@ export const Todo = () => {
   };
 
   const handleAdd = async () => {
-    await fetch("https://todoapp-backend-40tq.onrender.com/save", {
+    await fetch("https://demo-todo-zdid.onrender.com/save", {
       credentials: "include",
       method: "POST",
       headers: {
@@ -63,7 +63,7 @@ export const Todo = () => {
 
   const updateToDo = async (_id, updatedData) => {
     console.log(_id, updatedData);
-    await fetch(`https://todoapp-backend-40tq.onrender.com/update/${_id}`, {
+    await fetch(`https://demo-todo-zdid.onrender.com/update/${_id}`, {
       method: "PUT",
       headers: {
         "content-type": "application/json",
@@ -90,7 +90,7 @@ export const Todo = () => {
   };
 
   const handleDelete = async (_id) => {
-    await fetch(`https://todoapp-backend-40tq.onrender.com/delete/${_id}`, {
+    await fetch(`https://demo-todo-zdid.onrender.com/delete/${_id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -105,7 +105,7 @@ export const Todo = () => {
 
   const logout = async () => {
     const response = await fetch(
-      "https://todoapp-backend-40tq.onrender.com/logout",
+      "https://demo-todo-zdid.onrender.com/logout",
       {
         method: "POST",
         credentials: "include",
