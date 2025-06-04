@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://demotodo01.netlify.app/",
+    origin: "https://demotodo01.netlify.app",
     credentials: true,
   })
 );
