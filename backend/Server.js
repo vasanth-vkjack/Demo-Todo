@@ -15,8 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3000",
-    // origin: "https://resplendent-beignet-2fdf22.netlify.app/",
+    origin: "https://demotodo01.netlify.app/",
     credentials: true,
   })
 );
@@ -209,9 +208,11 @@ app.get("/todos", authenticateUser, async (req, res) => {
 
     const totalTodos = await ToDoModel.countDocuments({ userId: user._id });
     const totalPages = Math.ceil(totalTodos / limit);
-    
-    console.log(`Page ${page} - Showing ${todos.length} of ${totalTodos} todos`);
-    console.log(totalPages, totalTodos)
+
+    console.log(
+      `Page ${page} - Showing ${todos.length} of ${totalTodos} todos`
+    );
+    console.log(totalPages, totalTodos);
     res.send({
       success: true,
       todos,
