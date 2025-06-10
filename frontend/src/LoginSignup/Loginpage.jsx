@@ -16,7 +16,6 @@ const Loginpage = () => {
   const fetchProfile = async () => {
     const response = await fetch("https://demo-todo-zdid.onrender.com/profile", {
       credentials: "include",
-      mode: 'cors',
     });
 
     const data = await response.json();
@@ -31,7 +30,6 @@ const Loginpage = () => {
   const login = async () => {
     const response = await fetch("https://demo-todo-zdid.onrender.com/login", {
       method: "POST",
-      mode: 'cors',
       headers: {
         "Content-Type": "application/json",
       },
@@ -52,7 +50,6 @@ const Loginpage = () => {
   const signup = async () => {
     const response = await fetch("https://demo-todo-zdid.onrender.com/signup", {
       method: "POST",
-      mode: 'cors',
       headers: {
         "Content-Type": "application/json",
       },

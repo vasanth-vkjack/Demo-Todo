@@ -57,7 +57,6 @@ export const Todo = () => {
     await fetch("https://demo-todo-zdid.onrender.com/save", {
       credentials: "include",
       method: "POST",
-      mode: 'cors',
       headers: {
         "Content-Type": "application/json",
       },
@@ -81,7 +80,6 @@ export const Todo = () => {
     console.log(_id, updatedData);
     await fetch(`https://demo-todo-zdid.onrender.com/update/${_id}`, {
       method: "PUT",
-      mode: 'cors',
       headers: {
         "content-type": "application/json",
       },
@@ -109,7 +107,6 @@ export const Todo = () => {
   const handleDelete = async (_id) => {
     await fetch(`https://demo-todo-zdid.onrender.com/delete/${_id}`, {
       method: "DELETE",
-      mode: 'cors',
       headers: {
         "Content-Type": "application/json",
       },
@@ -124,7 +121,6 @@ export const Todo = () => {
   const logout = async () => {
     const response = await fetch("https://demo-todo-zdid.onrender.com/logout", {
       method: "POST",
-      mode: 'cors',
       credentials: "include",
     });
 
