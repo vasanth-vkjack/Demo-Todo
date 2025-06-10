@@ -5,9 +5,12 @@ export const fetchProfile = createAsyncThunk(
   "profile/fetchProfile",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("http://localhost:4000/profileDetails", {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "https://demo-todo-zdid.onrender.com/profileDetails",
+        {
+          withCredentials: true,
+        }
+      );
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response.data);
@@ -70,7 +73,12 @@ const profileSlice = createSlice({
       })
       .addCase(uploadProfilepic.fulfilled, (state, action) => {
         state.uploadLoading = false;
-        state.profile = {user:{...state.profile.user,profilePic:action.payload?.profilePic}}
+        state.profile = {
+          user: {
+            ...state.profile.user,
+            profilePic: action.payload?.profilePic,
+          },
+        };
       })
       .addCase(uploadProfilepic.rejected, (state, action) => {
         state.uploadLoading = false;

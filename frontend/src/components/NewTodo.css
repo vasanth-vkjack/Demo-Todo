@@ -30,19 +30,12 @@
   color: #333;
 }
 
-/* .cont-inp {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-} */
 .cont-inp {
   display: flex;
   justify-content: space-between;
   flex-direction: row;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  /* width: 380px; */
 }
 
 .cont-inp input[type="text"] {
@@ -183,7 +176,6 @@ select:focus {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  /* transition: background 0.2s ease; */
 }
 
 .btn .btn-update {
@@ -228,7 +220,6 @@ select:focus {
   display: flex;
   justify-content: flex-end;
   gap: 16px;
-  /* margin-top: 24px; */
 }
 
 .btn-edit button {
@@ -237,7 +228,6 @@ select:focus {
   border: none;
   cursor: pointer;
   font-weight: 500;
-  /* transition: background 0.3s; */
 }
 
 .btn-edit button:first-child {
@@ -279,7 +269,7 @@ Link:hover {
   margin-right: -400px;
   margin-bottom: -30px;
 }
-.top-bar-H{
+.top-bar-H {
   width: fit-content;
   display: flex;
   justify-content: flex-end;
@@ -362,7 +352,6 @@ Link:hover {
 .main2 .container {
   animation: fadeIn 0.3s ease-in-out;
 }
-
 
 @media (max-width: 600px) {
   body {

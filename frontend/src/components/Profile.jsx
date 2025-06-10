@@ -4,55 +4,26 @@ import { fetchProfile, uploadProfilepic } from "../slices/profileSlice";
 import "./Profile.css";
 
 const Profile = () => {
-  // const [profile, setProfile] = useState(null);
   const [newPic, setNewPic] = useState(null);
   const dispatch = useDispatch();
   const { profile, loading, error, uploadLoading } = useSelector(
     (state) => state.profile
   );
 
-  // const fetchProfile = async () => {
-  //   try {
-  //     const res = await fetch("http://localhost:4000/profileDetails", {
-  //       credentials: "include",
-  //     });
-  //     const data = await res.json();
-  //     if (data.success) setProfile(data);
-  //   } catch (err) {
-  //     console.error("Failed to fetch profile:", err);
-  //   }
-  // };
-
-  
   const handleUpload = async () => {
     if (newPic) {
       await dispatch(uploadProfilepic(newPic));
       setNewPic(null);
-      fetchProfile()
+      fetchProfile();
     }
   };
   useEffect(() => {
     dispatch(fetchProfile());
   }, [dispatch]);
-  
+
   if (loading) return <p>Loading profile...</p>;
   if (error) return <p>Error loading profile: {error.message}</p>;
   if (!profile) return <p>No profile data available</p>;
-
-  // const handleUpload = async () => {
-  //   const formData = new FormData();
-  //   formData.append("profilePic", newPic);
-
-  //   const res = await fetch("http://localhost:4000/uploadProfilePic", {
-  //     method: "POST",
-  //     credentials: "include",
-  //     body: formData,
-  //   });
-  //   const data = await res.json();
-  //   if (data.success) fetchProfile();
-  // };
-
-  // if (!profile) return <p>Loading profile...</p>;
 
   const { user, todoCount } = profile;
 
@@ -90,10 +61,9 @@ const Profile = () => {
         />
       </div>
       <div className="img-btn">
-        <button 
-        onClick={handleUpload}
-        disabled={!newPic || uploadLoading}
-        >{uploadLoading? 'Uploading...' : 'Update Picture'}</button>
+        <button onClick={handleUpload} disabled={!newPic || uploadLoading}>
+          {uploadLoading ? "Uploading..." : "Update Picture"}
+        </button>
       </div>
     </div>
   );

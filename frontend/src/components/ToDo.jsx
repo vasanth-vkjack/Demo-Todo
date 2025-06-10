@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import EditTodo from "./EditTodo";
 import "./NewTodo.css";
 import { useDispatch, useSelector } from "react-redux";
-import { addTodo, deleteTodo, updateTodos, setCurrentPage } from "../slices/userSlice";
+import {
+  addTodo,
+  deleteTodo,
+  updateTodos,
+  setCurrentPage,
+} from "../slices/userSlice";
 import { fetchTodos } from "../slices/userSlice";
 import { TextField } from "@mui/material";
 import Profile from "./Profile";
@@ -21,9 +26,6 @@ export const Todo = () => {
 
   const dispatch = useDispatch();
   const { profile } = useSelector((state) => state.profile);
-
-  // useEffect(() => {
-  // }, [dispatch]);
 
   const ITEMS_PER_PAGE = 10;
 
@@ -52,7 +54,7 @@ export const Todo = () => {
   };
 
   const handleAdd = async () => {
-    await fetch("http://localhost:4000/save", {
+    await fetch("https://demo-todo-zdid.onrender.com/save", {
       credentials: "include",
       method: "POST",
       headers: {
@@ -76,7 +78,7 @@ export const Todo = () => {
 
   const updateToDo = async (_id, updatedData) => {
     console.log(_id, updatedData);
-    await fetch(`http://localhost:4000/update/${_id}`, {
+    await fetch(`https://demo-todo-zdid.onrender.com/update/${_id}`, {
       method: "PUT",
       headers: {
         "content-type": "application/json",
@@ -103,7 +105,7 @@ export const Todo = () => {
   };
 
   const handleDelete = async (_id) => {
-    await fetch(`http://localhost:4000/delete/${_id}`, {
+    await fetch(`https://demo-todo-zdid.onrender.com/delete/${_id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -117,7 +119,7 @@ export const Todo = () => {
   };
 
   const logout = async () => {
-    const response = await fetch("http://localhost:4000/logout", {
+    const response = await fetch("https://demo-todo-zdid.onrender.com/logout", {
       method: "POST",
       credentials: "include",
     });
@@ -131,35 +133,19 @@ export const Todo = () => {
     }
   };
 
-  //  const filteredTodos = todos.filter((task) =>
-  //   task.text.toLowerCase().includes(searchQuery.toLowerCase())
-  // );
-  console.log("todos", todos, pagination.totalTodos);
-  // const filteredTodos = Array.isArray(todos)
-  //   ? todos.filter((task) =>
-  //       task?.text?.toLowerCase().includes(searchQuery.toLowerCase())
-  //     )
-  //   : [];
-  // const filteredTodos = (Array.isArray(todos) ? todos : []).filter((task) =>
-  //   task?.text?.toLowerCase().includes(searchQuery.toLowerCase())
-  // );
-
-  // const totalPages = Math.ceil(filteredTodos.length / ITEMS_PER_PAGE);
   const totalPages = pagination?.totalPages || 1;
-  // const paginatedTodos = filteredTodos.slice(
-  //   (pagination.currentPage - 1) * ITEMS_PER_PAGE,
-  //   pagination.currentPage * ITEMS_PER_PAGE
-  // );
+
   const paginatedTodos = Array.isArray(todos) ? todos : [];
 
-  const searchedTodos = searchQuery 
-  ? paginatedTodos.filter(todo => 
-      todo?.text?.toLowerCase().includes(searchQuery.toLowerCase()))
-  : paginatedTodos;
+  const searchedTodos = searchQuery
+    ? paginatedTodos.filter((todo) =>
+        todo?.text?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : paginatedTodos;
 
   const handlePageChange = (page) => {
     setCurrentPages(page);
-    dispatch(setCurrentPage(page))
+    dispatch(setCurrentPage(page));
     dispatch(fetchTodos({ page, limit: ITEMS_PER_PAGE }));
   };
   console.log("Todos from Redux:", todos);
@@ -174,7 +160,6 @@ export const Todo = () => {
               <img
                 src={profile.user.profilePic}
                 alt="Profile"
-                // className="profile-image"
                 style={{ width: "40px", height: "40px", borderRadius: "50%" }}
               />
             ) : (
@@ -231,7 +216,7 @@ export const Todo = () => {
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
-            setCurrentPage(1); // Reset to first page on search
+            setCurrentPage(1);
           }}
         />
       </div>
@@ -267,18 +252,7 @@ export const Todo = () => {
           <p>No todos to Display</p>
         )}
       </ul>
-     {/* <div className="pagination">
-        {Array.from({ length: totalPages }, (_, idx) => (
-          <button
-            key={idx + 1}
-            onClick={() => handlePageChange(idx + 1)}
-            className={pagination.currentPage === idx + 1 ? "active-page" : ""}
-          >
-            {idx + 1}
-          </button>
-        ))}
-      </div>*/}
-    {console.log("pagination",pagination)}
+      {console.log("pagination", pagination)}
       {pagination.totalPages > 1 && (
         <div className="pagination">
           <button
@@ -304,7 +278,9 @@ export const Todo = () => {
               <button
                 key={pageNum}
                 onClick={() => handlePageChange(pageNum)}
-                className={pagination.currentPage === pageNum ? "active-page" : ""}
+                className={
+                  pagination.currentPage === pageNum ? "active-page" : ""
+                }
               >
                 {pageNum}
               </button>
