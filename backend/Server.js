@@ -17,6 +17,8 @@ app.use(
   cors({
     origin: "https://todoapp9025.netlify.app/",
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -55,8 +57,8 @@ app.post("/signup", async (req, res) => {
   console.log(token);
   res.cookie("Token", token, {
     httpOnly: true,
-    sameSite: "Lax",
-    secure: false,
+    sameSite: "none",
+    secure: true,
     maxAge: 60 * 60 * 1000,
   });
 
@@ -81,8 +83,8 @@ app.post("/login", async (req, res) => {
   console.log(token);
   res.cookie("Token", token, {
     httpOnly: true,
-    sameSite: "Lax",
-    secure: false,
+    sameSite: "none",
+    secure: true,
     maxAge: 60 * 60 * 1000,
   });
 
