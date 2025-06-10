@@ -53,9 +53,11 @@
   font-weight: 600;
   cursor: pointer;
 }
-@media(max-width:500px){
+
+
+@media(max-width:600px){
     .loginsignup-container{
-        width: 350px;
+        width: 400px;
         height: 500px;
         padding: 20px 30px;
     }
@@ -70,6 +72,27 @@
     }
     .loginsignup-container button{
         height: 50px;
+        font-size: 16px;
+    }
+}
+@media(max-width:400px){
+    .loginsignup-container{
+        width: 320px;
+        height: 500px;
+        padding: 20px 30px;
+    }
+    .loginsignup-container h1{
+        font-size: 24px;
+    }
+    .loginsignup-field{
+        margin-top: 20px;
+    }
+    .loginsignup-field input{
+        height: 40px;
+        font-size: 16px;
+    }
+    .loginsignup-container button{
+        height: 40px;
         font-size: 16px;
     }
 }

@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import EditTodo from "./EditTodo";
 import "./NewTodo.css";
 import { useDispatch, useSelector } from "react-redux";
-import { addTodo, deleteTodo, updateTodos } from "../slices/userSlice";
+import { addTodo, deleteTodo, updateTodos, setCurrentPage } from "../slices/userSlice";
 import { fetchTodos } from "../slices/userSlice";
 import { TextField } from "@mui/material";
+import Profile from "./Profile";
+import { fetchProfile } from "../slices/profileSlice";
 
 export const Todo = () => {
   const [editId, setEditId] = useState(null);
@@ -14,17 +16,28 @@ export const Todo = () => {
     status: "Pending",
   });
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const ITEMS_PER_PAGE = 5;
+  const [currentPage, setCurrentPages] = useState(1);
+  const [showProfile, setShowProfile] = useState(false);
 
   const dispatch = useDispatch();
-  const { todos, loading, error } = useSelector((state) => {
+  const { profile } = useSelector((state) => state.profile);
+
+  // useEffect(() => {
+  // }, [dispatch]);
+
+  const ITEMS_PER_PAGE = 10;
+
+  const { todos, pagination, loading, error } = useSelector((state) => {
     return state.todos;
   });
   useEffect(() => {
-    dispatch(fetchTodos());
-  }, [dispatch]);
+    console.log("Todos data:", todos);
+  }, [todos]);
+
+  useEffect(() => {
+    dispatch(fetchProfile());
+    dispatch(fetchTodos({ page: currentPage, limit: ITEMS_PER_PAGE }));
+  }, [dispatch, currentPage]);
   if (loading) return <p>Loading todos...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -39,7 +52,7 @@ export const Todo = () => {
   };
 
   const handleAdd = async () => {
-    await fetch("https://demo-todo-zdid.onrender.com/save", {
+    await fetch("http://localhost:4000/save", {
       credentials: "include",
       method: "POST",
       headers: {
@@ -63,7 +76,7 @@ export const Todo = () => {
 
   const updateToDo = async (_id, updatedData) => {
     console.log(_id, updatedData);
-    await fetch(`https://demo-todo-zdid.onrender.com/update/${_id}`, {
+    await fetch(`http://localhost:4000/update/${_id}`, {
       method: "PUT",
       headers: {
         "content-type": "application/json",
@@ -86,11 +99,11 @@ export const Todo = () => {
     console.log(id, obj);
     await updateToDo(id, obj);
     setEditId(null);
-    dispatch(fetchTodos(obj));
+    dispatch(fetchTodos({ page: currentPage, limit: ITEMS_PER_PAGE }));
   };
 
   const handleDelete = async (_id) => {
-    await fetch(`https://demo-todo-zdid.onrender.com/delete/${_id}`, {
+    await fetch(`http://localhost:4000/delete/${_id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -104,13 +117,10 @@ export const Todo = () => {
   };
 
   const logout = async () => {
-    const response = await fetch(
-      "https://demo-todo-zdid.onrender.com/logout",
-      {
-        method: "POST",
-        credentials: "include",
-      }
-    );
+    const response = await fetch("http://localhost:4000/logout", {
+      method: "POST",
+      credentials: "include",
+    });
 
     const data = await response.json();
     if (data.success) {
@@ -121,23 +131,65 @@ export const Todo = () => {
     }
   };
 
-  const filteredTodos = todos.filter((task) =>
-    task.text.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  //  const filteredTodos = todos.filter((task) =>
+  //   task.text.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
+  console.log("todos", todos, pagination.totalTodos);
+  // const filteredTodos = Array.isArray(todos)
+  //   ? todos.filter((task) =>
+  //       task?.text?.toLowerCase().includes(searchQuery.toLowerCase())
+  //     )
+  //   : [];
+  // const filteredTodos = (Array.isArray(todos) ? todos : []).filter((task) =>
+  //   task?.text?.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
 
-  const totalPages = Math.ceil(filteredTodos.length / ITEMS_PER_PAGE);
-  const paginatedTodos = filteredTodos.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  // const totalPages = Math.ceil(filteredTodos.length / ITEMS_PER_PAGE);
+  const totalPages = pagination?.totalPages || 1;
+  // const paginatedTodos = filteredTodos.slice(
+  //   (pagination.currentPage - 1) * ITEMS_PER_PAGE,
+  //   pagination.currentPage * ITEMS_PER_PAGE
+  // );
+  const paginatedTodos = Array.isArray(todos) ? todos : [];
+
+  const searchedTodos = searchQuery 
+  ? paginatedTodos.filter(todo => 
+      todo?.text?.toLowerCase().includes(searchQuery.toLowerCase()))
+  : paginatedTodos;
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    setCurrentPages(page);
+    dispatch(setCurrentPage(page))
+    dispatch(fetchTodos({ page, limit: ITEMS_PER_PAGE }));
   };
+  console.log("Todos from Redux:", todos);
+  console.log("Type of todos:", typeof todos);
 
   return (
     <div className="main">
       <div className="top-bar">
+        {profile && (
+          <div className="user-icon" onClick={() => setShowProfile(true)}>
+            {profile.user.profilePic ? (
+              <img
+                src={profile.user.profilePic}
+                alt="Profile"
+                // className="profile-image"
+                style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+              />
+            ) : (
+              profile.user.name.charAt(0).toUpperCase()
+            )}
+          </div>
+        )}
+
+        <div className={`profile-sidebar ${showProfile ? "show" : ""}`}>
+          <Profile />
+          <button className="close-btn" onClick={() => setShowProfile(false)}>
+            X
+          </button>
+        </div>
+
         <button className="login-link" onClick={() => logout()}>
           Logout
         </button>
@@ -146,6 +198,7 @@ export const Todo = () => {
         <h1>To-do App</h1>
         <div className="cont-inp">
           <input
+            size="small"
             name="text"
             type="text"
             value={input.text}
@@ -183,40 +236,90 @@ export const Todo = () => {
         />
       </div>
       <ul className="list">
-        {paginatedTodos?.map((todo, index) => (
-          <li key={index}>
-            <div className="todos">
-              <div className="todo">
-                <strong className="text">{todo.text}</strong>-{" "}
-                <em className="status">{todo.status}</em>
-                <div className="desc">{todo.description}</div>
+        {console.log("Renderinng Todos:", paginatedTodos)}
+        {searchedTodos?.length > 0 ? (
+          searchedTodos?.map((todo, index) => (
+            <li key={index}>
+              <div className="todos">
+                <div className="todo">
+                  <strong className="text">{todo.text}</strong>-{" "}
+                  <em className="status">{todo.status}</em>
+                  <div className="desc">{todo.description}</div>
+                </div>
+                <div className="btn">
+                  <button
+                    className="btn-update"
+                    onClick={() => handleEdit(todo)}
+                  >
+                    Update
+                  </button>
+                  <button
+                    className="btn-delete"
+                    onClick={() => handleDelete(todo._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-              <div className="btn">
-                <button className="btn-update" onClick={() => handleEdit(todo)}>
-                  Update
-                </button>
-                <button
-                  className="btn-delete"
-                  onClick={() => handleDelete(todo._id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </li>
-        ))}
+            </li>
+          ))
+        ) : (
+          <p>No todos to Display</p>
+        )}
       </ul>
-      <div className="pagination">
+     {/* <div className="pagination">
         {Array.from({ length: totalPages }, (_, idx) => (
           <button
             key={idx + 1}
             onClick={() => handlePageChange(idx + 1)}
-            className={currentPage === idx + 1 ? "active-page" : ""}
+            className={pagination.currentPage === idx + 1 ? "active-page" : ""}
           >
             {idx + 1}
           </button>
         ))}
-      </div>
+      </div>*/}
+    {console.log("pagination",pagination)}
+      {pagination.totalPages > 1 && (
+        <div className="pagination">
+          <button
+            onClick={() => handlePageChange(pagination.currentPage - 1)}
+            disabled={pagination.currentPage === 1}
+          >
+            Previous
+          </button>
+
+          {Array.from({ length: Math.min(5, totalPages) }, (_, idx) => {
+            let pageNum;
+            if (totalPages <= 5) {
+              pageNum = idx + 1;
+            } else if (pagination.currentPage <= 3) {
+              pageNum = idx + 1;
+            } else if (pagination.currentPage >= totalPages - 2) {
+              pageNum = totalPages - 4 + idx;
+            } else {
+              pageNum = pagination.currentPage - 2 + idx;
+            }
+
+            return (
+              <button
+                key={pageNum}
+                onClick={() => handlePageChange(pageNum)}
+                className={pagination.currentPage === pageNum ? "active-page" : ""}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => handlePageChange(pagination.currentPage + 1)}
+            disabled={pagination.currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
+
       <div>
         {editId && (
           <EditTodo

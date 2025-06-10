@@ -8,6 +8,10 @@ const UsersSchema = new mongoose.Schema({
     ref: "Todo",
     type: mongoose.Schema.Types.ObjectId,
   },
+  profilePic: {
+    type: String,
+    default: "", // Placeholder or default avatar
+  },
 });
 
 module.exports = mongoose.model("Users", UsersSchema);

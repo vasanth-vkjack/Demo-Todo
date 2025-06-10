@@ -5,6 +5,9 @@ const app = express();
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const PORT = process.env.PORT || 4000;
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
 require("dotenv").config();
 
@@ -12,12 +15,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://demotodo01.netlify.app",
+    origin: "http://localhost:3000",
+    // origin: "https://resplendent-beignet-2fdf22.netlify.app/",
     credentials: true,
   })
 );
-// origin: "http://localhost:3000",
-// origin: "https://resplendent-beignet-2fdf22.netlify.app/",
 
 mongoose
   .connect(process.env.MONGODB_URL)
@@ -54,8 +56,8 @@ app.post("/signup", async (req, res) => {
   console.log(token);
   res.cookie("Token", token, {
     httpOnly: true,
-    sameSite: "None",
-    secure: true,
+    sameSite: "Lax",
+    secure: false,
     maxAge: 60 * 60 * 1000,
   });
 
@@ -80,15 +82,15 @@ app.post("/login", async (req, res) => {
   console.log(token);
   res.cookie("Token", token, {
     httpOnly: true,
-    sameSite: "None",
-    secure: true,
+    sameSite: "Lax",
+    secure: false,
     maxAge: 60 * 60 * 1000,
   });
 
   res.json({ success: true, message: "Logged in successfully" });
 });
 
-app.get("/profile", (req, res) => { 
+app.get("/profile", (req, res) => {
   const token = req.cookies.Token;
   if (!token)
     return res.status(401).json({ success: false, error: "No token provided" });
@@ -118,7 +120,7 @@ const authenticateUser = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("result", decoded);
+    console.log("reult", decoded);
     req.email = decoded.email;
     next();
   } catch (err) {
@@ -126,11 +128,105 @@ const authenticateUser = async (req, res, next) => {
   }
 };
 
+// Profile page route
+
+app.get("/profileDetails", authenticateUser, async (req, res) => {
+  try {
+    const user = await Users.findOne({ email: req.email }).select("-password");
+    const todos = await ToDoModel.find({ userId: user._id });
+    res.json({
+      success: true,
+      user,
+      todoCount: todos.length,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: "Failed to load profile" });
+  }
+});
+
+// Multer storage setup
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = path.join(__dirname, "uploads");
+
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath);
+    }
+
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
+    );
+  },
+});
+
+const upload = multer({ storage });
+
+app.use("/uploads", express.static("uploads"));
+
+app.post(
+  "/uploadProfilePic",
+  authenticateUser,
+  upload.single("profilePic"),
+  async (req, res) => {
+    const profileUrl = `${req.protocol}://${req.get("host")}/uploads/${
+      req.file.filename
+    }`;
+    await Users.findOneAndUpdate(
+      { email: req.email },
+      { profilePic: profileUrl }
+    );
+    res.json({ success: true, profilePic: profileUrl });
+  }
+);
+
 app.get("/todos", authenticateUser, async (req, res) => {
-  const user = await Users.findOne({ email: req?.email });
-  console.log("user", user);
-  const toDo = await ToDoModel.find({ userId: user?._id });
-  res.send(toDo);
+  // const user = await Users.findOne({ email: req?.email });
+  // console.log("user", user);
+  // const toDo = await ToDoModel.find({ userId: user?._id });
+  // res.send(toDo);
+
+  try {
+    const user = await Users.findOne({ email: req?.email });
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    //Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    //Get todos with pagination
+    const todos = await ToDoModel.find({ userId: user._id })
+      .skip(skip)
+      .limit(limit);
+
+    const totalTodos = await ToDoModel.countDocuments({ userId: user._id });
+    const totalPages = Math.ceil(totalTodos / limit);
+    
+    console.log(`Page ${page} - Showing ${todos.length} of ${totalTodos} todos`);
+    console.log(totalPages, totalTodos)
+    res.send({
+      success: true,
+      todos,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalTodos,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching todos:", error);
+    res.status(500).send({ message: "server error", error: error.message });
+  }
 });
 
 app.post("/save", authenticateUser, async (req, res) => {

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import EditTodo from "./EditTodo";
+import "./NewTodo.css";
 import { Link } from "react-router-dom";
-import { TextField } from "@mui/material"
+import { TextField } from "@mui/material";
 
 export const Home = () => {
   const [editId, setEditId] = useState(null);
@@ -78,7 +79,7 @@ export const Home = () => {
 
   return (
     <div className="main">
-      <div className="top-bar">
+      <div className="top-bar-H">
         <Link to="/loginpage" className="login-link">
           Login
         </Link>

@@ -18,7 +18,7 @@ const EditTodo = ({ todo, onClose, onSave }) => {
     <div className="main2">
       <div className="container">
         <h2>Edit To-Do</h2>
-        <div className="cont-inp">
+        <div className="cont-inp edit-inp">
           <input
             value={newInput}
             type="text"
