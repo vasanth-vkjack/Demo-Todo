@@ -26,7 +26,7 @@ export const uploadProfilepic = createAsyncThunk(
       formdata.append("profilePic", file);
 
       const response = await axios.post(
-        "http://localhost:4000/uploadProfilePic",
+        "https://demo-todo-zdid.onrender.com/uploadProfilePic",
         formdata,
         {
           withCredentials: true,
