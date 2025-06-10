@@ -196,12 +196,12 @@ app.get("/todos", authenticateUser, async (req, res) => {
       return res.status(404).send({ message: "User not found" });
     }
 
-    //Pagination parameters
+    //Pagination 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    //Get todos with pagination
+   
     const todos = await ToDoModel.find({ userId: user._id })
       .skip(skip)
       .limit(limit);
