@@ -173,7 +173,7 @@ app.post(
   authenticateUser,
   upload.single("profilePic"),
   async (req, res) => {
-    const profileUrl = `${req.protocol}://${req.get("host")}/uploads/${
+    const profileUrl = `https://${req.get("host")}/uploads/${
       req.file.filename
     }`;
     await Users.findOneAndUpdate(
