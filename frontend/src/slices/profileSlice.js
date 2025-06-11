@@ -9,6 +9,10 @@ export const fetchProfile = createAsyncThunk(
         "https://demo-todo-zdid.onrender.com/profileDetails",
         {
           withCredentials: true,
+          mode: cors,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
       return response.data;
