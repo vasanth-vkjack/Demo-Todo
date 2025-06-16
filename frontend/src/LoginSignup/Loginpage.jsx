@@ -1,23 +1,47 @@
 import React, { useState } from "react";
 import "./Loginpage.css";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const loginSchema = yup.object().shape({
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
+
+const signupSchema = yup.object().shape({
+  username: yup.string().required("Username is required"),
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
 
 const Loginpage = () => {
   const [state, setState] = useState("Login");
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "", 
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(state === "Login" ? loginSchema : signupSchema),
   });
 
-  const changeHandler = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
   const fetchProfile = async () => {
-    const response = await fetch("https://demo-todo-zdid.onrender.com/profile", {
+    const response = await fetch("http://localhost:4000/profile", {
       credentials: "include",
     });
-
     const data = await response.json();
     if (data.success) {
       alert("Welcome: " + data.email);
@@ -27,41 +51,23 @@ const Loginpage = () => {
     }
   };
 
-  const login = async () => {
-    const response = await fetch("https://demo-todo-zdid.onrender.com/login", {
+  const onSubmit = async (formData) => {
+    const url = state === "Login" ? "/login" : "/signup";
+    const response = await fetch(`http://localhost:4000${url}`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify(formData),
     });
 
     const data = await response.json();
     if (data.success) {
-      alert("Login successful");
-      fetchProfile();
-      console.log(data);
-    } else {
-      alert(data.errors);
-    }
-  };
-
-  const signup = async () => {
-    const response = await fetch("https://demo-todo-zdid.onrender.com/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(formData),
-    });
-
-    const data = await response.json();
-    if (data.success) {
-      alert("Signup successful");
-      setState("Login");
-      console.log(data);
+      alert(`${state} successful`);
+      if (state === "Login") {
+        fetchProfile();
+      } else {
+        setState("Login");
+      }
     } else {
       alert(data.errors);
     }
@@ -71,34 +77,39 @@ const Loginpage = () => {
     <div className="loginsignup">
       <div className="loginsignup-container">
         <h1>{state}</h1>
-        <div className="loginsignup-field">
+        <form onSubmit={handleSubmit(onSubmit)} className="loginsignup-field">
           {state === "Sign Up" && (
-            <input
-              name="username"
-              value={formData.username}
-              onChange={changeHandler}
-              type="text"
-              placeholder="Your Name"
-            />
+            <>
+              <input
+                type="text"
+                placeholder="Your Name"
+                {...register("username")}
+              />
+              {errors.username && (
+                <p className="error">{errors.username?.message}</p>
+              )}
+            </>
           )}
+
           <input
-            name="email"
-            value={formData.email}
-            onChange={changeHandler}
             type="email"
             placeholder="Email Address"
+            {...register("email")}
           />
+          {errors.email && <p className="error">{errors.email?.message}</p>}
+
           <input
-            name="password"
-            value={formData.password}
-            onChange={changeHandler}
             type="password"
             placeholder="Password"
+            {...register("password")}
           />
-        </div>
-        <button onClick={() => (state === "Login" ? login() : signup())}>
-          Continue
-        </button>
+          {errors.password && (
+            <p className="error">{errors.password?.message}</p>
+          )}
+
+          <button type="submit">Continue</button>
+        </form>
+
         {state === "Sign Up" ? (
           <p className="loginsignup-login">
             Already have an account?{" "}

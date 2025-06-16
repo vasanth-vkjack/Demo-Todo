@@ -54,6 +54,11 @@
   cursor: pointer;
 }
 
+.error{
+  color: red;
+  font-size: 12px;
+}
+
 
 @media(max-width:600px){
     .loginsignup-container{
