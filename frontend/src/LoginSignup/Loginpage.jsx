@@ -39,7 +39,7 @@ const Loginpage = () => {
   });
 
   const fetchProfile = async () => {
-    const response = await fetch("http://localhost:4000/profile", {
+    const response = await fetch("https://demo-todo-zdid.onrender.com/profile", {
       credentials: "include",
     });
     const data = await response.json();
@@ -53,7 +53,7 @@ const Loginpage = () => {
 
   const onSubmit = async (formData) => {
     const url = state === "Login" ? "/login" : "/signup";
-    const response = await fetch(`http://localhost:4000${url}`, {
+    const response = await fetch(`https://demo-todo-zdid.onrender.com${url}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
